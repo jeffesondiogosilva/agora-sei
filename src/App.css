@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+/* src/App.css */
+.item-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.item {
+  margin: 10px;
+  text-align: center;
+}
+
+.item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
