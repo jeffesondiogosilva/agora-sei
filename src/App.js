@@ -2,14 +2,16 @@
 import React from 'react';
 import AddItem from './components/AddItem';
 import ItemList from './components/ItemList';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './Home';
 
 function App() {
     return (
-        <div className="App">
-            <h1>React Firebase CRUD</h1>
-            <AddItem />
-            <ItemList />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Home />} />
+            </Routes>
+        </Router>
     );
 }
 
