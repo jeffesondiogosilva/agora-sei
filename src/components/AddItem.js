@@ -1,8 +1,8 @@
 // src/components/AddItem.js
 import React, { useState } from 'react';
-import { db, storage } from '../firebase'; // Certifique-se de que a importação está correta
+import { db, storage } from '../firebase'; // Certifique-se de que está importando corretamente
 import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Importar funções do storage
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 function AddItem() {
     const [title, setTitle] = useState('');
@@ -12,41 +12,70 @@ function AddItem() {
         e.preventDefault();
 
         if (!title || !image) {
-            alert("Please provide both title and image.");
+            alert("Por favor, forneça título e imagem.");
             return;
         }
 
-        // Referência ao arquivo no Storage
-        const fileRef = ref(storage, `images/${image.name}`);
-        await uploadBytes(fileRef, image);
-        const imageUrl = await getDownloadURL(fileRef);
-
         try {
+            // Upload da imagem para o Storage
+            const fileRef = ref(storage, `images/${image.name}`);
+            await uploadBytes(fileRef, image);
+            const imageUrl = await getDownloadURL(fileRef);
+
+            // Adiciona o documento ao Firestore
             await addDoc(collection(db, 'items'), {
                 title: title,
-                imageUrl: imageUrl
+                imageUrl: imageUrl,
             });
+
             setTitle('');
             setImage(null);
-        } catch (e) {
-            console.error("Error adding document: ", e);
+            alert("Item adicionado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao adicionar item:", error);
         }
     };
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-            />
-            <input
-                type="file"
-                onChange={(e) => setImage(e.target.files[0])}
-                accept="image/*"
-            />
-            <button type="submit">Add Item</button>
+    return (        
+            <form className="form-control p-4 shadow-sm rounded" onSubmit={handleSubmit}>
+            <h1>Cadastro de Reforçador</h1>
+
+            {/* Campo de Título */}
+            <div className="mb-3">
+                <label htmlFor="title" className="form-label">Título</label>
+                <input
+                    type="text"
+                    id="title"
+                    className="form-control"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Digite o título"
+                    required
+                />
+            </div>
+
+            {/* Campo de Upload de Imagem */}
+            <div className="mb-3">
+                <label htmlFor="image" className="form-label">Imagem</label>
+                <input
+                    type="file"
+                    id="image"
+                    className="form-control"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    accept="image/*"
+                    required
+                />
+            </div>
+
+            {/* Botão de Enviar */}
+            <button type="submit" className="btn btn-primary" disabled={uploading}>
+                {uploading ? "Enviando..." : "Adicionar Item"}
+            </button>
+
+            {/* Link para voltar */}
+            <div className="mt-3">
+                <a href="/" className="btn btn-link">Voltar</a>
+            </div>        
         </form>
     );
 }
