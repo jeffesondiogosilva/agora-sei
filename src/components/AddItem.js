@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 function AddItem() {
     const [title, setTitle] = useState('');
     const [image, setImage] = useState(null);
+    const [uploading, setUploading] = useState(false); // Adicionado estado para o upload
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,6 +16,8 @@ function AddItem() {
             alert("Por favor, forneça título e imagem.");
             return;
         }
+
+        setUploading(true); // Define que o upload está em andamento
 
         try {
             // Upload da imagem para o Storage
@@ -33,11 +36,13 @@ function AddItem() {
             alert("Item adicionado com sucesso!");
         } catch (error) {
             console.error("Erro ao adicionar item:", error);
+        } finally {
+            setUploading(false); // Upload finalizado
         }
     };
 
     return (        
-            <form className="form-control p-4 shadow-sm rounded" onSubmit={handleSubmit}>
+        <form className="form-control p-4 shadow-sm rounded" onSubmit={handleSubmit}>
             <h1>Cadastro de Reforçador</h1>
 
             {/* Campo de Título */}
