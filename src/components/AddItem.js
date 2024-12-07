@@ -1,47 +1,53 @@
 // src/components/AddItem.js
 import React, { useState } from 'react';
-import { db, storage } from '../firebase'; // Certifique-se de que está importando corretamente
-import { collection, addDoc } from 'firebase/firestore';
+import { db, storage } from '../firebase'; // Certifique-se de importar corretamente
+import { collection, doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 function AddItem() {
     const [title, setTitle] = useState('');
     const [image, setImage] = useState(null);
-    const [uploading, setUploading] = useState(false); // Adicionado estado para o upload
+    const [uploading, setUploading] = useState(false); // Estado para monitorar upload
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!title || !image) {
-            alert("Por favor, forneça título e imagem.");
+            alert("Por favor, forneça um título e uma imagem.");
             return;
         }
 
-        setUploading(true); // Define que o upload está em andamento
+        setUploading(true); // Inicia o estado de upload
 
         try {
+            // Cria um ID único para o documento
+            const newId = doc(collection(db, 'reforcador')).id;
+
             // Upload da imagem para o Storage
-            const fileRef = ref(storage, `images/${image.name}`);
+            const fileRef = ref(storage, `images/${newId}_${image.name}`);
             await uploadBytes(fileRef, image);
             const imageUrl = await getDownloadURL(fileRef);
 
-            // Adiciona o documento ao Firestore
-            await addDoc(collection(db, 'items'), {
+            // Salva o documento no Firestore
+            await setDoc(doc(db, 'reforcador', newId), {
+                id: newId,
                 title: title,
                 imageUrl: imageUrl,
             });
 
+            // Reseta os campos do formulário
             setTitle('');
             setImage(null);
-            alert("Item adicionado com sucesso!");
+            alert("Reforçador adicionado com sucesso!");
         } catch (error) {
-            console.error("Erro ao adicionar item:", error);
+            console.error("Erro ao adicionar reforçador:", error);
+            alert("Erro ao adicionar reforçador. Verifique o console para mais detalhes.");
         } finally {
-            setUploading(false); // Upload finalizado
+            setUploading(false); // Finaliza o estado de upload
         }
     };
 
-    return (        
+    return (
         <form className="form-control p-4 shadow-sm rounded" onSubmit={handleSubmit}>
             <h1>Cadastro de Reforçador</h1>
 
@@ -74,13 +80,17 @@ function AddItem() {
 
             {/* Botão de Enviar */}
             <button type="submit" className="btn btn-primary" disabled={uploading}>
-                {uploading ? "Enviando..." : "Adicionar Item"}
+                {uploading ? "Enviando..." : "Adicionar Reforçador"}
             </button>
 
             {/* Link para voltar */}
             <div className="mt-3">
                 <a href="/" className="btn btn-link">Voltar</a>
-            </div>        
+            </div>
+
+            <button className='bg-success rounded'>
+                <a href="/add-item" className='text-light text-decoration-none'>Lista de Personalizados</a>
+            </button>
         </form>
     );
 }

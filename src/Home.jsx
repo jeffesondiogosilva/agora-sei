@@ -36,6 +36,9 @@ const Home = () => {
           <button className='bg-success rounded'>
             <a href="/add-item" className='text-light text-decoration-none'>Cadastrar Reforçador</a>
           </button>
+          <button className='bg-primary rounded'  style={{ marginLeft: "2px" }}>
+            <a href="/item-list" className='text-light text-decoration-none'>Lista de Personalizados</a>
+          </button>
         </div>
       </header>
       <div className="reinforcer-grid">
