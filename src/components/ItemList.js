@@ -1,7 +1,7 @@
 // src/components/ItemList.js
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 function ItemList() {
     const [items, setItems] = useState([]);
@@ -33,6 +33,18 @@ function ItemList() {
         window.speechSynthesis.speak(utterance);
     };
 
+    const handleDelete = async (id) => {
+        if (window.confirm('Tem certeza que deseja excluir este item?')) {
+            try {
+                await deleteDoc(doc(db, 'reforcador', id)); // Remove o documento do Firestore
+                setItems(prevItems => prevItems.filter(item => item.id !== id)); // Remove o item da lista localmente
+            } catch (err) {
+                console.error('Erro ao deletar item:', err);
+                alert('Erro ao deletar item. Tente novamente mais tarde.');
+            }
+        }
+    };
+
     if (loading) {
         return <div>Carregando itens...</div>;
     }
@@ -57,6 +69,12 @@ function ItemList() {
                             />
                             <div className="card-body text-center">
                                 <h5 className="card-title">{item.title}</h5>
+                                <button
+                                    className="btn btn-danger mt-2"
+                                    onClick={() => handleDelete(item.id)}
+                                >
+                                    Excluir
+                                </button>
                             </div>
                         </div>
                     </div>
